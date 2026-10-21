@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="使用 nmap 检测一个或多个 IPv4 网段中的在线设备。">
+  <title>网段 IP 在线检测</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <h1>网段 IP 在线检测</h1>
+
+    <section class="query-area" aria-label="扫描条件">
+      <label for="networks" class="sr-only">需要扫描的 IPv4 网段</label>
+      <input id="networks" class="network-input" type="text" spellcheck="false" autocomplete="off" placeholder="例如：172.16.11.0/24，172.16.10.0/24">
+      <button id="scanButton" class="button button-primary" type="button"><span class="button-label">检测</span></button>
+      <section id="searchPanel" class="ip-search" aria-label="搜索结果" hidden>
+        <span class="control-divider" aria-hidden="true"></span>
+        <label for="ipSearch" class="sr-only">搜索 IP</label>
+        <input id="ipSearch" type="search" inputmode="decimal" autocomplete="off" placeholder="模糊搜索 IP，例如：172.16.11">
+        <button id="searchButton" class="button button-primary" type="button">查询</button>
+      </section>
+    </section>
+    <div class="query-tip">多个网段用逗号分隔，按回车检测</div>
+
+    <div class="status-bar">
+      <span><i id="statusDot" class="status-dot"></i><span id="systemText">正在检查扫描引擎</span></span>
+      <span id="commandTarget">等待输入目标</span>
+    </div>
+    <div id="searchFeedback" class="search-feedback" aria-live="polite"></div>
+
+    <div class="local-network-bar">
+      <div><span>本机 IP</span><strong id="localIp">正在获取…</strong></div>
+      <div><span>当前网段</span><strong id="localNetwork">正在获取…</strong></div>
+      <div><span>本机 MAC</span><strong id="localMac">正在获取…</strong></div>
+      <div><span>网卡</span><strong id="localInterface">正在获取…</strong></div>
+      <div><span>探测耗时</span><strong id="scanDuration">--</strong></div>
+    </div>
+
+    <section id="resultSection" class="results-section" aria-live="polite">
+      <div class="section-title">
+        <h2>检测结果</h2>
+        <div class="result-actions">
+          <span id="resultSummary">等待检测</span>
+          <div id="exportTools" class="export-tools" hidden>
+            <label for="exportFormat" class="sr-only">导出格式</label>
+            <select id="exportFormat">
+              <option value="xlsx">Excel (.xlsx)</option>
+              <option value="docx">Word (.docx)</option>
+              <option value="pdf">PDF (.pdf)</option>
+              <option value="md">Markdown (.md)</option>
+              <option value="txt">文本 (.txt)</option>
+            </select>
+            <button id="exportButton" class="export-button" type="button">导出</button>
+          </div>
+        </div>
+      </div>
+      <div id="emptyState" class="empty-state">暂无数据</div>
+      <div id="results" class="results-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <div>基于 Nmap 的局域网在线设备检测工具 <span>|</span> <a href="https://opensource.org/license/mit" target="_blank" rel="noopener noreferrer">MIT 协议</a></div>
+      <div>版权所有 © 2026-present <a href="https://github.com/liuchenyang0703" target="_blank" rel="noopener noreferrer">Liucy</a></div>
+    </div>
+  </footer>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
