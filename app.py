@@ -188,6 +188,7 @@ def scan_network(network):
             errors="replace",
             timeout=SCAN_TIMEOUT,
             check=False,
+            creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0,
         )
     except subprocess.TimeoutExpired:
         return {"network": network, "hosts": [], "status": "error", "error": f"扫描超时（{SCAN_TIMEOUT} 秒）"}

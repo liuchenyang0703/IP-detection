@@ -10,12 +10,14 @@ NetScope 是一个无需数据库的局域网 IP 检测工具。后端使用 Pyt
 - 多网段并行扫描，并按网段分别展示结果
 - 展示在线设备的 IP、主机名、MAC 地址、设备厂商和状态
 - 自动展示服务器的本机 IP、当前网段、MAC 地址和网卡名称
+- 页面加载后自动将当前网段填入空白的检测框，不覆盖手动输入的内容
 - 自动补全 Nmap 扫描本机时缺失的本机 MAC 信息
 - 支持对扫描结果进行 IP 模糊搜索
 - 搜索后只显示匹配的数据，清空搜索框恢复全部结果
 - 扫描过程中显示动态加载条
 - 支持导出当前展示结果：Excel、Word、PDF、Markdown 和 TXT
 - 导出文件顶部会注明本次检测的网段；存在搜索条件时也会注明筛选内容
+- Windows 扫描时隐藏 Nmap 子进程窗口，不弹出命令行窗口
 - 支持 Windows 和 Linux
 
 ## 环境要求
@@ -37,7 +39,7 @@ nmap --version
 4. 安装 Python 依赖并启动服务：
 
 ```powershell
-cd "D:\vscode\项目\ip-check"
+cd "D:\vscode\项目\IP-detection"
 D:\miniconda3\python.exe -m pip install -r requirements.txt
 D:\miniconda3\python.exe app.py
 ```
@@ -208,23 +210,39 @@ TRUST_PROXY=true gunicorn -w 2 -b 127.0.0.1:5000 --timeout 180 app:app
 
 ## 测试
 
+Windows：
+
+```powershell
+D:\miniconda3\python.exe -m unittest discover -s tests -v
+```
+
+Linux：
+
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-测试包含：
+测试使用 Python 标准库 `unittest`。涉及 Nmap 执行和本机网卡信息的场景使用 `unittest.mock` 模拟，因此运行测试不会真的扫描局域网，也不依赖当前网络中必须存在设备。
 
-- Nmap 输出解析
-- 非法网段拦截
-- 多网段输入顺序
-- 本机网络信息接口
-- MAC 地址格式化
-- XLSX、DOCX、PDF、Markdown 和 TXT 导出
+当前测试包含：
+
+| 测试内容 | 测试方法 |
+| --- | --- |
+| Nmap 输出解析 | 使用固定的 Nmap 文本样本，检查 IP、主机名、MAC 和厂商解析结果 |
+| 非法网段拦截 | 向扫描接口提交非法 CIDR，检查接口返回 HTTP 400 |
+| 访问日志 | 模拟客户端 IP 请求健康接口，检查日志是否记录该 IP |
+| 本机网络信息 | 模拟网卡信息，检查接口返回的 IP、网段和 MAC |
+| MAC 地址格式化 | 检查横线格式转换以及全零 MAC 的过滤 |
+| Windows 无弹窗扫描 | 模拟 Nmap 进程，检查调用参数是否包含隐藏窗口标志 |
+| 导出功能 | 在内存中生成五种格式，检查响应状态和文件签名 |
+| 多网段扫描顺序 | 模拟多个扫描结果，检查 CIDR 归一化和输入顺序是否保持 |
+
+`tests/` 不是启动服务所必需的，部署时即使不运行测试也不影响应用；但建议在源码仓库中保留，用于修改后快速发现回归问题。
 
 ## 项目结构
 
 ```text
-ip-check/
+IP-detection/
 ├── app.py                 # Flask 后端、Nmap 调用和导出功能
 ├── requirements.txt       # Python 依赖
 ├── templates/

@@ -54,6 +54,19 @@ class AppTests(unittest.TestCase):
         self.assertEqual(app.normalize_mac("aa-bb-cc-dd-ee-ff"), "AA:BB:CC:DD:EE:FF")
         self.assertIsNone(app.normalize_mac("00:00:00:00:00:00"))
 
+    @patch('app.get_primary_network_info', return_value=None)
+    @patch('app.subprocess.run')
+    @patch('app.resolve_nmap', return_value='nmap.exe')
+    def test_scan_hides_nmap_window_on_windows(self, _resolve_nmap, run, _get_network):
+        run.return_value.returncode = 0
+        run.return_value.stdout = ''
+        run.return_value.stderr = ''
+
+        app.scan_network('172.16.11.0/24')
+
+        expected_flags = app.subprocess.CREATE_NO_WINDOW if app.os.name == 'nt' else 0
+        self.assertEqual(run.call_args.kwargs['creationflags'], expected_flags)
+
     def test_exports_all_supported_formats(self):
         payload = {
             "networks": ["172.16.11.0/24"],

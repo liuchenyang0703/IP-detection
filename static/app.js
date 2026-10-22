@@ -115,6 +115,10 @@ async function showLocalNetwork() {
     localNetwork.textContent = data.network;
     localMac.textContent = data.mac || '未获取到';
     localInterface.textContent = data.interface || '-';
+    if (!input.value.trim()) {
+      input.value = data.network;
+      updateTargetCount();
+    }
   } catch (error) {
     [localIp, localNetwork, localMac, localInterface].forEach(element => {
       element.textContent = error.message;
