@@ -103,7 +103,7 @@ def parse_nmap_output(output):
     for raw_line in output.splitlines():
         line = raw_line.strip()
         if line.startswith("Nmap scan report for "):
-            target = line.removeprefix("Nmap scan report for ")
+            target = line[len("Nmap scan report for "):]
             match = re.match(r"^(.*?)\s*\(([^)]+)\)$", target)
             if match:
                 current = {"hostname": match.group(1).strip(), "ip": match.group(2).strip()}
@@ -111,7 +111,7 @@ def parse_nmap_output(output):
                 current = {"hostname": "", "ip": target.strip()}
             hosts.append(current)
         elif current and line.startswith("MAC Address: "):
-            mac_info = line.removeprefix("MAC Address: ")
+            mac_info = line[len("MAC Address: "):]
             match = re.match(r"^([0-9A-Fa-f:]{17})(?:\s+\((.*)\))?$", mac_info)
             if match:
                 current["mac"] = match.group(1).upper()

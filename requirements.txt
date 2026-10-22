@@ -1,5 +1,5 @@
-Flask==3.1.2
+Flask>=3.0,<3.1
 psutil==7.1.1
 openpyxl>=3.1,<4
-python-docx>=1.1,<2
-reportlab>=4.2,<5
+python-docx>=1.1,<1.2
+reportlab>=4.2,<4.3

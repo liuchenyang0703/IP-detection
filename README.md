@@ -22,7 +22,7 @@ NetScope 是一个无需数据库的局域网 IP 检测工具。后端使用 Pyt
 
 ## 环境要求
 
-- Python 3.9 或更高版本
+- Python 3.8 或更高版本
 - Nmap
 - Windows 使用 Nmap 时需要安装 Npcap
 
@@ -36,12 +36,28 @@ NetScope 是一个无需数据库的局域网 IP 检测工具。后端使用 Pyt
 nmap --version
 ```
 
-4. 安装 Python 依赖并启动服务：
+4. 根据本机环境选择一种启动方式。
+
+### 不使用 Conda
+
+确认 Python 已加入 `PATH`，然后执行：
 
 ```powershell
 cd "D:\vscode\项目\IP-detection"
-D:\miniconda3\python.exe -m pip install -r requirements.txt
-D:\miniconda3\python.exe app.py
+python -m pip install -r requirements.txt
+python ip.py
+```
+
+### 使用 Conda
+
+首次使用时创建 Python 3.8 环境；已有合适环境时可以直接激活：
+
+```powershell
+cd "D:\vscode\项目\IP-detection"
+conda create -n netscope python=3.8 -y
+conda activate netscope
+python -m pip install -r requirements.txt
+python ip.py
 ```
 
 浏览器打开：
@@ -59,20 +75,19 @@ C:\Program Files\Nmap\nmap.exe
 
 ## Linux 安装与启动
 
-Ubuntu / Debian 安装 Nmap：
+Ubuntu / Debian 安装 Python、pip 和 Nmap：
 
 ```bash
 sudo apt update
-sudo apt install -y nmap
+sudo apt install -y python3 python3-pip nmap
 ```
 
-在 conda 环境中启动：
+安装依赖并启动：
 
 ```bash
-conda activate 你的环境名
-cd /path/to/ip-check
+cd /path/to/IP-detection
 python3 -m pip install -r requirements.txt
-python3 app.py
+python3 ip.py
 ```
 
 浏览器打开 `http://服务器IP:5000`。如果需要从其他机器访问，请确认 Linux 防火墙允许访问 5000 端口。
@@ -99,7 +114,7 @@ sudo ufw allow 5000/tcp
 
 ```bash
 cd /path/to/ip-check
-nohup python3 -u app.py > nohup.out 2>&1 &
+nohup python3 -u ip.py > nohup.out 2>&1 &
 echo $! > app.pid
 ```
 
@@ -172,13 +187,13 @@ Windows 手动指定 Nmap：
 
 ```powershell
 $env:NMAP_PATH = 'C:\Program Files (x86)\Nmap\nmap.exe'
-D:\miniconda3\python.exe app.py
+D:\miniconda3\python.exe ip.py
 ```
 
 Linux 手动指定 Nmap：
 
 ```bash
-NMAP_PATH=/usr/bin/nmap python3 app.py
+NMAP_PATH=/usr/bin/nmap python3 ip.py
 ```
 
 ## 生产环境部署
@@ -187,7 +202,7 @@ Linux 生产环境建议使用 Gunicorn，并在前面配置 Nginx：
 
 ```bash
 python3 -m pip install gunicorn
-gunicorn -w 2 -b 127.0.0.1:5000 --timeout 180 app:app
+gunicorn -w 2 -b 127.0.0.1:5000 --timeout 180 ip:app
 ```
 
 Nginx 再将请求反向代理到 `127.0.0.1:5000`。
@@ -203,17 +218,17 @@ proxy_set_header Host $host;
 启动应用时启用代理信任：
 
 ```bash
-TRUST_PROXY=true gunicorn -w 2 -b 127.0.0.1:5000 --timeout 180 app:app
+TRUST_PROXY=true gunicorn -w 2 -b 127.0.0.1:5000 --timeout 180 ip:app
 ```
 
 > 只有应用始终位于可信反向代理后面时才启用 `TRUST_PROXY`，不要在直接暴露 Flask 端口时启用。
 
 ## 测试
 
-Windows：
+Windows（普通 Python 或已激活的 Conda 环境）：
 
 ```powershell
-D:\miniconda3\python.exe -m unittest discover -s tests -v
+python -m unittest discover -s tests -v
 ```
 
 Linux：
@@ -243,7 +258,7 @@ python3 -m unittest discover -s tests -v
 
 ```text
 IP-detection/
-├── app.py                 # Flask 后端、Nmap 调用和导出功能
+├── ip.py                  # Flask 后端、Nmap 调用和导出功能
 ├── requirements.txt       # Python 依赖
 ├── templates/
 │   └── index.html         # 页面结构
